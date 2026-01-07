@@ -87,7 +87,11 @@ class IdentityService:
                 "permissions": ["read", "limited_write"]
             }
         }
-        return role_mappings.get(business_role.lower(), {})
+        # Return default entitlements for unknown roles
+        return role_mappings.get(business_role.lower(), {
+            "slack": {"channels": ["#general"]},
+            "permissions": ["read"]
+        })
     
     async def _provision_to_targets(self, identity: Identity):
         """Provision identity to target applications"""
