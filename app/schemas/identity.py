@@ -27,35 +27,9 @@ class IdentityBase(BaseModel):
     termination_date: Optional[date] = None
     last_working_day: Optional[date] = None
     
-    # Organizational Information
+    # Job Information - simplified
     department: Optional[str] = None
     location: Optional[str] = None
-    cost_center: Optional[str] = None
-    division: Optional[str] = None
-    building: Optional[str] = None
-    floor: Optional[str] = None
-    office: Optional[str] = None
-    
-    # Job Information
-    job_title: Optional[str] = None
-    job_code: Optional[str] = None
-    job_level: Optional[str] = None
-    job_family: Optional[str] = None
-    
-    # Manager Relationships
-    manager_id: Optional[int] = None
-    manager_external_id: Optional[str] = None
-    reports_to_name: Optional[str] = None
-    
-    # Security & Compliance
-    security_clearance: Optional[str] = None
-    background_check_status: Optional[str] = None
-    background_check_date: Optional[date] = None
-    
-    # Account Status & Lifecycle
-    account_status: Optional[str] = "ACTIVE"
-    lifecycle_state: Optional[str] = "ACTIVE"
-    risk_score: Optional[int] = 0
     
     # Business Role & Entitlements
     business_role: str
@@ -84,35 +58,9 @@ class IdentityUpdate(BaseModel):
     termination_date: Optional[date] = None
     last_working_day: Optional[date] = None
     
-    # Organizational Information
+    # Job Information - simplified
     department: Optional[str] = None
     location: Optional[str] = None
-    cost_center: Optional[str] = None
-    division: Optional[str] = None
-    building: Optional[str] = None
-    floor: Optional[str] = None
-    office: Optional[str] = None
-    
-    # Job Information
-    job_title: Optional[str] = None
-    job_code: Optional[str] = None
-    job_level: Optional[str] = None
-    job_family: Optional[str] = None
-    
-    # Manager Relationships
-    manager_id: Optional[int] = None
-    manager_external_id: Optional[str] = None
-    reports_to_name: Optional[str] = None
-    
-    # Security & Compliance
-    security_clearance: Optional[str] = None
-    background_check_status: Optional[str] = None
-    background_check_date: Optional[date] = None
-    
-    # Account Status & Lifecycle
-    account_status: Optional[str] = None
-    lifecycle_state: Optional[str] = None
-    risk_score: Optional[int] = None
     
     # Business Role & Entitlements
     business_role: Optional[str] = None

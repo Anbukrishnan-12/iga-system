@@ -31,35 +31,9 @@ class Identity(Base):
     termination_date = Column(Date, nullable=True)
     last_working_day = Column(Date, nullable=True)
     
-    # Organizational Information
+    # Job Information - simplified
     department = Column(String, nullable=True)
     location = Column(String, nullable=True)
-    cost_center = Column(String, nullable=True)
-    division = Column(String, nullable=True)
-    building = Column(String, nullable=True)
-    floor = Column(String, nullable=True)
-    office = Column(String, nullable=True)
-    
-    # Job Information
-    job_title = Column(String, nullable=True)
-    job_code = Column(String, nullable=True)
-    job_level = Column(String, nullable=True)
-    job_family = Column(String, nullable=True)
-    
-    # Manager Relationships
-    manager_id = Column(Integer, ForeignKey('identities.id'), nullable=True)
-    manager_external_id = Column(String, nullable=True)
-    reports_to_name = Column(String, nullable=True)
-    
-    # Security & Compliance
-    security_clearance = Column(String, nullable=True)
-    background_check_status = Column(String, nullable=True)
-    background_check_date = Column(Date, nullable=True)
-    
-    # Account Status & Lifecycle
-    account_status = Column(String, default="ACTIVE")
-    lifecycle_state = Column(String, default="ACTIVE")
-    risk_score = Column(Integer, default=0)
     
     # Business Role & Entitlements (existing)
     business_role = Column(String, index=True)
@@ -72,8 +46,7 @@ class Identity(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     last_modified_by = Column(String, default="system")
     
-    # Relationships
-    manager = relationship("Identity", remote_side=[id], backref="direct_reports")
+    # Relationships - removed for simplicity
 
 class TargetApplication(Base):
     __tablename__ = "target_applications"

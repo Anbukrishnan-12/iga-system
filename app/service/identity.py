@@ -61,4 +61,9 @@ class IdentityService:
         if "slack" in entitlements:
             slack_config = entitlements["slack"]
             channels = slack_config.get("channels", [])
-            await self.slack_service.create_user_account(identity.primary_email, channels)
+            await self.slack_service.create_user_account(
+                identity.primary_email, 
+                identity.first_name, 
+                identity.last_name, 
+                channels
+            )
