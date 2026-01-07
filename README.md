@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # IGA System - Identity Governance & Administration
 
 A minimal FastAPI-based Identity Governance & Administration system with Slack integration.
@@ -53,3 +54,6 @@ pytest tests/
 - **developer**: Access to #dev-team, #general channels
 - **manager**: Access to #management, #general channels with admin permissions
 - **hr**: Access to #hr, #general channels with user management permissions
+=======
+"# iga-system" 
+>>>>>>> 830a5ffb3433f0f1035532a1baa3b0dc6f1821bc
