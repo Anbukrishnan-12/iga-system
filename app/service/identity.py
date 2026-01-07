@@ -39,16 +39,52 @@ class IdentityService:
         """Map business roles to entitlements"""
         role_mappings = {
             "developer": {
-                "slack": {"channels": ["#dev-team", "#general"]},
-                "permissions": ["read", "write"]
+                "slack": {"channels": ["#dev-team", "#general", "#tech-updates"]},
+                "permissions": ["read", "write", "code_access"]
+            },
+            "tester": {
+                "slack": {"channels": ["#qa-team", "#general", "#bug-reports"]},
+                "permissions": ["read", "write", "test_access"]
             },
             "manager": {
-                "slack": {"channels": ["#management", "#general"]},
-                "permissions": ["read", "write", "admin"]
+                "slack": {"channels": ["#management", "#general", "#leadership"]},
+                "permissions": ["read", "write", "admin", "team_management"]
             },
             "hr": {
-                "slack": {"channels": ["#hr", "#general"]},
-                "permissions": ["read", "write", "user_management"]
+                "slack": {"channels": ["#hr", "#general", "#announcements"]},
+                "permissions": ["read", "write", "user_management", "employee_data"]
+            },
+            "designer": {
+                "slack": {"channels": ["#design-team", "#general", "#creative"]},
+                "permissions": ["read", "write", "design_tools"]
+            },
+            "analyst": {
+                "slack": {"channels": ["#analytics", "#general", "#data-insights"]},
+                "permissions": ["read", "write", "data_access", "reports"]
+            },
+            "devops": {
+                "slack": {"channels": ["#devops", "#general", "#infrastructure", "#alerts"]},
+                "permissions": ["read", "write", "admin", "infrastructure_access"]
+            },
+            "sales": {
+                "slack": {"channels": ["#sales", "#general", "#customer-updates"]},
+                "permissions": ["read", "write", "crm_access"]
+            },
+            "marketing": {
+                "slack": {"channels": ["#marketing", "#general", "#campaigns"]},
+                "permissions": ["read", "write", "marketing_tools"]
+            },
+            "support": {
+                "slack": {"channels": ["#support", "#general", "#customer-issues"]},
+                "permissions": ["read", "write", "support_tools"]
+            },
+            "intern": {
+                "slack": {"channels": ["#general", "#interns"]},
+                "permissions": ["read"]
+            },
+            "contractor": {
+                "slack": {"channels": ["#general", "#contractors"]},
+                "permissions": ["read", "limited_write"]
             }
         }
         return role_mappings.get(business_role.lower(), {})
