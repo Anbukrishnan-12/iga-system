@@ -87,7 +87,7 @@ def get_identities_by_role(
     service = IdentityService(db)
     return service.get_identities_by_role(role)
 
-@router.get("/all", response_model=List[Identity], summary="Get All Identities")
+@router.get("/list/all", response_model=List[Identity], summary="Get All Identities")
 def get_all_identities(
     db: Session = Depends(get_db),
     _: bool = Depends(AuthService.verify_hr_access)
