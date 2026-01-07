@@ -33,8 +33,13 @@ async def create_identity(
     - `developer`, `tester`, `manager`, `hr`, `designer`, `analyst`
     - `devops`, `sales`, `marketing`, `support`, `intern`, `contractor`
     """
-    service = IdentityService(db)
-    return await service.create_identity(identity)
+    try:
+        service = IdentityService(db)
+        return await service.create_identity(identity)
+    except Exception as e:
+        import logging
+        logging.error(f"Error creating identity: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @router.get("/{identity_id}", response_model=Identity, summary="Retrieve Identity Details")
 def get_identity(

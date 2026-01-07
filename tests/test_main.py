@@ -34,57 +34,74 @@ def test_health_check(client):
 
 def test_create_identity(client):
     identity_data = {
+        "username": "testuser",
         "employee_id": "EMP001",
-        "email": "test@example.com",
-        "business_role": "developer"
+        "primary_email": "test@example.com",
+        "business_role": "developer",
+        "first_name": "Test",
+        "last_name": "User",
+        "display_name": "Test User"  # Added required field
     }
-    response = client.post("/api/v1/identity/", json=identity_data)
-    assert response.status_code == 200
+    headers = {"X-User-Role": "hr"}
+    response = client.post("/api/v1/identity/", json=identity_data, headers=headers)
+    print(f"Response status: {response.status_code}")
+    print(f"Response body: {response.text}")
+    assert response.status_code == 201
     data = response.json()
     assert data["employee_id"] == "EMP001"
-    assert data["email"] == "test@example.com"
+    assert data["primary_email"] == "test@example.com"
     assert data["business_role"] == "developer"
     assert "entitlements" in data
 
 def test_get_identity(client):
     # First create an identity
     identity_data = {
+        "username": "testuser2",
         "employee_id": "EMP002",
-        "email": "test2@example.com",
-        "business_role": "manager"
+        "primary_email": "test2@example.com",
+        "business_role": "manager",
+        "first_name": "Test",
+        "last_name": "Manager"
     }
-    create_response = client.post("/api/v1/identity/", json=identity_data)
+    headers = {"X-User-Role": "hr"}
+    create_response = client.post("/api/v1/identity/", json=identity_data, headers=headers)
     identity_id = create_response.json()["id"]
     
     # Then get it
-    response = client.get(f"/api/v1/identity/{identity_id}")
+    response = client.get(f"/api/v1/identity/{identity_id}", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["employee_id"] == "EMP002"
 
 def test_get_identities_by_role(client):
-    response = client.get("/api/v1/identity/role/developer")
+    headers = {"X-User-Role": "hr"}
+    response = client.get("/api/v1/identity/role/developer", headers=headers)
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 def test_update_identity(client):
     # Create identity first
     identity_data = {
+        "username": "testuser3",
         "employee_id": "EMP003",
-        "email": "test3@example.com",
-        "business_role": "developer"
+        "primary_email": "test3@example.com",
+        "business_role": "developer",
+        "first_name": "Test",
+        "last_name": "Developer"
     }
-    create_response = client.post("/api/v1/identity/", json=identity_data)
+    headers = {"X-User-Role": "hr"}
+    create_response = client.post("/api/v1/identity/", json=identity_data, headers=headers)
     identity_id = create_response.json()["id"]
     
     # Update it
     update_data = {"business_role": "manager"}
-    response = client.put(f"/api/v1/identity/{identity_id}", json=update_data)
+    response = client.put(f"/api/v1/identity/{identity_id}", json=update_data, headers=headers)
     assert response.status_code == 200
     assert response.json()["business_role"] == "manager"
 
 def test_get_nonexistent_identity(client):
-    response = client.get("/api/v1/identity/999")
+    headers = {"X-User-Role": "hr"}
+    response = client.get("/api/v1/identity/999", headers=headers)
     assert response.status_code == 404
 
 @pytest.mark.asyncio

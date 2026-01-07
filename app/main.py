@@ -1,10 +1,33 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from app.core.config import settings
 from app.api.identity import router as identity_router
 from app.api.slack import router as slack_router
 from app.api.employee import router as employee_router
 from app.api.database import router as database_router
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize database on startup
+try:
+    from app.core.database import engine, Base
+    from app.models.identity import Identity, TargetApplication
+    from sqlalchemy import inspect
+    
+    inspector = inspect(engine)
+    existing_tables = inspector.get_table_names()
+    
+    if 'identities' not in existing_tables:
+        logger.info("Initializing database tables...")
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database initialized successfully!")
+    else:
+        logger.info("Database tables already exist")
+except Exception as e:
+    logger.error(f"Database initialization error: {str(e)}")
 
 app = FastAPI(
     title="IGA System - Identity Governance & Administration",

@@ -1,6 +1,9 @@
 import httpx
 from app.core.config import settings
 from typing import Dict, Any, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SlackService:
     def __init__(self):
@@ -56,36 +59,55 @@ class SlackService:
     
     async def get_or_create_user(self, email: str, first_name: str, last_name: str = None) -> Dict[str, Any]:
         """Get existing user or create new one"""
-        # First try to get existing user
-        user = await self.get_user_by_email(email)
-        
-        if user:
+        try:
+            # First try to get existing user
+            user = await self.get_user_by_email(email)
+            
+            if user:
+                return {
+                    "user_id": user["id"],
+                    "email": email,
+                    "status": "existing",
+                    "name": user.get("real_name", "")
+                }
+            
+            # If user doesn't exist, create new one
+            new_user = await self.create_slack_user(email, first_name, last_name)
+            
+            if new_user:
+                return {
+                    "user_id": new_user.get("id"),
+                    "email": email,
+                    "status": "created",
+                    "name": f"{first_name} {last_name or ''}".strip()
+                }
+            
             return {
-                "user_id": user["id"],
+                "user_id": None,
                 "email": email,
-                "status": "existing",
-                "name": user.get("real_name", "")
+                "status": "failed",
+                "error": "Could not create user in Slack"
             }
-        
-        # If user doesn't exist, create new one
-        new_user = await self.create_slack_user(email, first_name, last_name)
-        
-        if new_user:
+        except Exception as e:
+            logger.error(f"Error in get_or_create_user: {str(e)}")
             return {
-                "user_id": new_user.get("id"),
+                "user_id": None,
                 "email": email,
-                "status": "created",
-                "name": f"{first_name} {last_name or ''}".strip()
+                "status": "error",
+                "error": str(e)
             }
-        
-        return {
-            "user_id": None,
-            "email": email,
-            "status": "failed",
-            "error": "Could not create user in Slack"
-        }
     async def create_user_account(self, email: str, first_name: str, last_name: str = None, channels: list = None) -> Dict[str, Any]:
         """Main method for user provisioning with channel assignment"""
+        # If no Slack token configured, return mock response
+        if not settings.slack_bot_token:
+            return {
+                "user_id": "mock_user_id",
+                "email": email,
+                "status": "mocked",
+                "name": f"{first_name} {last_name or ''}".strip(),
+                "channels_assigned": channels or []
+            }
+        
         # Get or create user
         result = await self.get_or_create_user(email, first_name, last_name)
         

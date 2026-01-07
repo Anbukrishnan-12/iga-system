@@ -18,7 +18,7 @@ class IdentityRepository:
         return self.db.query(Identity).filter(Identity.id == identity_id).first()
     
     def get_by_email(self, email: str) -> Optional[Identity]:
-        return self.db.query(Identity).filter(Identity.email == email).first()
+        return self.db.query(Identity).filter(Identity.primary_email == email).first()
     
     def get_by_business_role(self, role: str) -> List[Identity]:
         return self.db.query(Identity).filter(Identity.business_role == role).all()

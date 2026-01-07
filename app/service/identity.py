@@ -3,6 +3,9 @@ from app.repository.identity import IdentityRepository
 from app.schemas.identity import IdentityCreate, IdentityUpdate, Identity
 from app.service.slack import SlackService
 from typing import List, Optional, Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 class IdentityService:
     def __init__(self, db: Session):
@@ -10,17 +13,21 @@ class IdentityService:
         self.slack_service = SlackService()
     
     async def create_identity(self, identity_data: IdentityCreate) -> Identity:
-        # Apply business role mapping
-        entitlements = self._map_business_role_to_entitlements(identity_data.business_role)
-        identity_data.entitlements = entitlements
-        
-        # Create identity
-        identity = self.repository.create(identity_data)
-        
-        # Provision to target applications
-        await self._provision_to_targets(identity)
-        
-        return identity
+        try:
+            # Apply business role mapping
+            entitlements = self._map_business_role_to_entitlements(identity_data.business_role)
+            identity_data.entitlements = entitlements
+            
+            # Create identity
+            identity = self.repository.create(identity_data)
+            
+            # Provision to target applications
+            await self._provision_to_targets(identity)
+            
+            return identity
+        except Exception as e:
+            logger.error(f"Error creating identity: {str(e)}")
+            raise
     
     def get_identity(self, identity_id: int) -> Optional[Identity]:
         return self.repository.get_by_id(identity_id)
@@ -37,6 +44,9 @@ class IdentityService:
     
     def _map_business_role_to_entitlements(self, business_role: str) -> Dict[str, Any]:
         """Map business roles to entitlements"""
+        if not business_role:
+            raise ValueError("Business role is required")
+            
         role_mappings = {
             "developer": {
                 "slack": {"channels": ["#dev-team", "#general", "#tech-updates"]},
@@ -87,23 +97,34 @@ class IdentityService:
                 "permissions": ["read", "limited_write"]
             }
         }
-        # Return default entitlements for unknown roles
-        return role_mappings.get(business_role.lower(), {
-            "slack": {"channels": ["#general"]},
-            "permissions": ["read"]
-        })
+        
+        # Check if role exists, if not, log warning and return default
+        role_lower = business_role.lower()
+        if role_lower not in role_mappings:
+            logger.warning(f"Unknown business role '{business_role}', using default entitlements")
+            return {
+                "slack": {"channels": ["#general"]},
+                "permissions": ["read"]
+            }
+        
+        return role_mappings[role_lower]
     
     async def _provision_to_targets(self, identity: Identity):
         """Provision identity to target applications"""
-        entitlements = identity.entitlements or {}
-        
-        # Provision to Slack
-        if "slack" in entitlements:
-            slack_config = entitlements["slack"]
-            channels = slack_config.get("channels", [])
-            await self.slack_service.create_user_account(
-                identity.primary_email, 
-                identity.first_name, 
-                identity.last_name, 
-                channels
-            )
+        try:
+            entitlements = identity.entitlements or {}
+            
+            # Provision to Slack
+            if "slack" in entitlements:
+                slack_config = entitlements["slack"]
+                channels = slack_config.get("channels", [])
+                await self.slack_service.create_user_account(
+                    identity.primary_email, 
+                    identity.first_name, 
+                    identity.last_name, 
+                    channels
+                )
+        except Exception as e:
+            logger.error(f"Error provisioning to targets: {str(e)}")
+            # Don't fail the whole operation if provisioning fails
+            pass
