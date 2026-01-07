@@ -6,6 +6,7 @@ from app.api.slack import router as slack_router
 from app.api.employee import router as employee_router
 from app.api.database import router as database_router
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,10 @@ try:
     from app.core.database import engine, Base
     from app.models.identity import Identity, TargetApplication
     from sqlalchemy import inspect
+    import os
+    
+    # Create data directory if it doesn't exist
+    os.makedirs("data", exist_ok=True)
     
     inspector = inspect(engine)
     existing_tables = inspector.get_table_names()
