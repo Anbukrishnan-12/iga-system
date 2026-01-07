@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from app.core.auth import AuthService
 from app.service.slack import SlackService
 from app.schemas.identity import (
     SlackUserRequest, 
@@ -84,21 +85,18 @@ async def create_new_slack_user(request: SlackCreateUserRequest):
     return SlackUserResponse(**result)
 
 @router.get("/search/{user_id}", response_model=SlackUserSearchResponse, summary="Search User by ID")
-async def search_slack_user(user_id: str):
+async def search_slack_user(
+    user_id: str,
+    _: bool = Depends(AuthService.verify_hr_access)
+):
     """
-    **Search User by Slack User ID**
+    **Search User by Slack User ID** (HR Only)
     
     Retrieves detailed user information from Slack workspace using user ID.
+    **Restricted to HR personnel only.**
     
-    **Use Cases:**
-    - User profile verification
-    - Account status checking
-    - User details lookup for audit
-    
-    **Returns:**
-    - Complete user profile information
-    - Account status and activity
-    - User preferences and settings
+    **Required Header:**
+    - `X-User-Role`: Must be "hr"
     """
     service = SlackService()
     user = await service.get_user_by_id(user_id)
@@ -116,21 +114,18 @@ async def search_slack_user(user_id: str):
     )
 
 @router.delete("/delete/{user_id}", response_model=SlackDeleteResponse, summary="Delete Slack User")
-async def delete_slack_user(user_id: str):
+async def delete_slack_user(
+    user_id: str,
+    _: bool = Depends(AuthService.verify_hr_access)
+):
     """
-    **Delete User from Slack Workspace**
+    **Delete User from Slack Workspace** (HR Only)
     
     Removes or deactivates user from Slack workspace permanently.
+    **Restricted to HR personnel only.**
     
-    **Process:**
-    1. Attempts to delete user via SCIM API
-    2. If deletion fails, deactivates user account
-    3. Returns operation status and details
-    
-    **Use Cases:**
-    - Employee termination
-    - Account cleanup
-    - Security incident response
+    **Required Header:**
+    - `X-User-Role`: Must be "hr"
     
     **Warning:** This action may be irreversible depending on Slack configuration.
     """
