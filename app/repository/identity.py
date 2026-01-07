@@ -23,6 +23,9 @@ class IdentityRepository:
     def get_by_business_role(self, role: str) -> List[Identity]:
         return self.db.query(Identity).filter(Identity.business_role == role).all()
     
+    def get_all(self) -> List[Identity]:
+        return self.db.query(Identity).all()
+    
     def update(self, identity_id: int, update_data: IdentityUpdate) -> Optional[Identity]:
         identity = self.get_by_id(identity_id)
         if identity:

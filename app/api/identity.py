@@ -87,6 +87,23 @@ def get_identities_by_role(
     service = IdentityService(db)
     return service.get_identities_by_role(role)
 
+@router.get("/all", response_model=List[Identity], summary="Get All Identities")
+def get_all_identities(
+    db: Session = Depends(get_db),
+    _: bool = Depends(AuthService.verify_hr_access)
+):
+    """
+    **Get All Identities** (HR Only)
+    
+    Retrieves all users in the system.
+    **Restricted to HR personnel only.**
+    
+    **Required Header:**
+    - `X-User-Role`: Must be "hr"
+    """
+    service = IdentityService(db)
+    return service.get_all_identities()
+
 @router.put("/{identity_id}", response_model=Identity, summary="Update Identity")
 async def update_identity(
     identity_id: int,

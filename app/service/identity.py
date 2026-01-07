@@ -35,6 +35,9 @@ class IdentityService:
     def get_identities_by_role(self, role: str) -> List[Identity]:
         return self.repository.get_by_business_role(role)
     
+    def get_all_identities(self) -> List[Identity]:
+        return self.repository.get_all()
+    
     async def update_identity(self, identity_id: int, update_data: IdentityUpdate) -> Optional[Identity]:
         identity = self.repository.update(identity_id, update_data)
         if identity and update_data.business_role:
