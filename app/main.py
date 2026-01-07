@@ -56,6 +56,14 @@ app = FastAPI(
             "description": "Slack workspace integration for automated user provisioning and channel management."
         },
         {
+            "name": "Employee Management",
+            "description": "Complete employee lifecycle management including personal information, skills, and leave management."
+        },
+        {
+            "name": "Database Administration",
+            "description": "Database initialization and management endpoints for system administrators."
+        },
+        {
             "name": "System Health",
             "description": "System monitoring and health check endpoints for operational visibility."
         }
