@@ -6,16 +6,64 @@ from app.api.slack import router as slack_router
 
 app = FastAPI(
     title="IGA System - Identity Governance & Administration",
-    description="Enterprise Identity Management Platform with Slack Integration",
+    description="""
+    ## Enterprise Identity Management Platform
+    
+    **IGA System** provides comprehensive identity governance and administration capabilities for modern enterprises.
+    
+    ### Key Features
+    - **Identity Lifecycle Management**: Complete CRUD operations for user identities
+    - **Role-Based Access Control**: Automated entitlement provisioning based on business roles
+    - **Multi-Application Integration**: Seamless provisioning to target applications
+    - **Slack Integration**: Direct user provisioning to Slack channels
+    - **Audit & Compliance**: Full audit trail for identity operations
+    
+    ### Business Roles Supported
+    - **Developer**: Access to development channels and resources
+    - **Manager**: Administrative access with team management capabilities  
+    - **HR**: User management permissions and HR-specific channels
+    
+    ### API Standards
+    - RESTful API design following OpenAPI 3.0 specifications
+    - JSON request/response format
+    - HTTP status codes for proper error handling
+    - Comprehensive input validation
+    
+    ### Support
+    For technical support or business inquiries, contact our enterprise support team.
+    """,
     version="1.0.0",
+    contact={
+        "name": "IGA System Support",
+        "email": "support@igasystem.com",
+        "url": "https://igasystem.com/support"
+    },
+    license_info={
+        "name": "Enterprise License",
+        "url": "https://igasystem.com/license"
+    },
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    openapi_tags=[
+        {
+            "name": "Identity Management",
+            "description": "Core identity lifecycle operations including create, read, update, and delete functionalities."
+        },
+        {
+            "name": "Slack Integration", 
+            "description": "Slack workspace integration for automated user provisioning and channel management."
+        },
+        {
+            "name": "System Health",
+            "description": "System monitoring and health check endpoints for operational visibility."
+        }
+    ]
 )
 
 app.include_router(identity_router, prefix="/api/v1/identity", tags=["Identity Management"])
 app.include_router(slack_router, prefix="/api/v1/slack", tags=["Slack Integration"])
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def homepage():
     html_content = """
 <!DOCTYPE html>
@@ -102,8 +150,27 @@ async def homepage():
     """
     return HTMLResponse(content=html_content, status_code=200)
 
-@app.get("/health")
+@app.get("/health", tags=["System Health"], summary="System Health Check")
 async def health_check():
+    """
+    **System Health Check Endpoint**
+    
+    Returns the current operational status of the IGA System including:
+    - Service availability status
+    - System version information
+    - Service identification
+    
+    This endpoint is used by:
+    - Load balancers for health monitoring
+    - CI/CD pipelines for deployment verification
+    - Monitoring systems for uptime tracking
+    - Operations teams for system diagnostics
+    
+    **Response Format:**
+    - `status`: Current system status (healthy/unhealthy)
+    - `service`: Service name identifier
+    - `version`: Current deployed version
+    """
     return {"status": "healthy", "service": "IGA System", "version": "1.0.0"}
 
 if __name__ == "__main__":
